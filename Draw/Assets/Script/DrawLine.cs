@@ -1,19 +1,31 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class DrawLine : MonoBehaviour
 {
-    public GameObject LinePrefab;
+    [SerializeField] GameObject LinePrefab;
+    [SerializeField] TextMeshProUGUI DrawText;
     [HideInInspector] public List<GameObject> DrawClone;
     [HideInInspector] public  List<Vector2> FingerPosList;
+    public static bool Locked;
+    int TotalDraw;
     GameObject Draw;
     LineRenderer _lineRenderer;
     EdgeCollider2D _EdgeCollider;
-   
+
+    private void Start()
+    {
+        TotalDraw = 3;
+        DrawText.text = TotalDraw.ToString();
+        Locked = true;
+    }
 
     void Update()
     {
+       if (!Locked) 
+      {  
         if (Input.GetMouseButtonDown(0))
         {
             CreateDraw();
@@ -26,9 +38,17 @@ public class DrawLine : MonoBehaviour
                 UpdateDraw(FingerPos);
             }
         }
+      }
+        if (Input.GetMouseButtonUp(0))
+        {
+            if (DrawClone.Count!=0 && TotalDraw==0) 
+                Locked = true;
+        }
     }
     void CreateDraw()
     {
+        TotalDraw--;
+        DrawText.text = TotalDraw.ToString();   
         Draw = Instantiate(LinePrefab, Vector2.zero, Quaternion.identity);
         DrawClone.Add(Draw);
         _lineRenderer = Draw.GetComponent<LineRenderer>();
@@ -56,6 +76,7 @@ public class DrawLine : MonoBehaviour
             Destroy(item.gameObject);
         }
         DrawClone.Clear();
+        TotalDraw = 3;
+        DrawText.text = TotalDraw.ToString();
     }
-
 }

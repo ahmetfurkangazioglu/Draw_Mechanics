@@ -8,22 +8,22 @@ public class BallShot : MonoBehaviour
     [SerializeField] GameObject ShotPoint;
     [SerializeField] GameObject Box;
     [SerializeField] GameObject[] BoxPoint;
+    [SerializeField] GameManager manager;
     int CurrentBall;
+    int LevelValue;
     bool Locked;
 
-    private void Start()
-    {
-        StartCoroutine(ShotOperation());
-    }
     IEnumerator ShotOperation()
     {
         while (true)
         {
             if (!Locked)
             {
+                DrawLine.Locked = false;
                 yield return new WaitForSeconds(1f);
                 BallOperation();
                 Invoke("BoxOperation", 0.7f);
+                Invoke("StartTime", 5f);
                 Locked = true;
             }
             else
@@ -34,13 +34,29 @@ public class BallShot : MonoBehaviour
     }
 
 
+    public void ShotControl()
+    {
+        Box.SetActive(false);
+        CancelInvoke();
+        Locked = false;
+    }
+    public void StartGame()
+    {
+        StartCoroutine(ShotOperation());
+    }
     void BallOperation()
     {
+        if (LevelValue%3==0)
+        {
+
+        }
+        else
+        {
+
+        }
         Balls[CurrentBall].transform.position = ShotPoint.transform.position;
         Balls[CurrentBall].SetActive(true);
-        float angel = Random.Range(70f, 110f);
-        Vector3 Pos = Quaternion.AngleAxis(angel, Vector3.forward) * Vector3.right;
-        Balls[CurrentBall].GetComponent<Rigidbody2D>().AddForce(750 * Pos);
+        Balls[CurrentBall].GetComponent<Rigidbody2D>().AddForce(750 * NewPos());
         if (CurrentBall != Balls.Length - 1)
         {
             CurrentBall++;
@@ -57,9 +73,18 @@ public class BallShot : MonoBehaviour
         Box.SetActive(true);
     }
 
-    public void ShotControl()
+    void StartTime()
     {
-        Box.SetActive(false);
-        Locked = false;
+        manager.Lose();
+    }
+    
+   
+    Vector3 NewPos()
+    {
+        return Quaternion.AngleAxis(RandomAngle(70f,110f), Vector3.forward) * Vector3.right;
+    }
+    float RandomAngle(float value1, float value2)
+    {
+        return Random.Range(value1, value2);
     }
 }
