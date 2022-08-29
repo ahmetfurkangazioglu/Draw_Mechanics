@@ -9,14 +9,15 @@ public class Ball : MonoBehaviour
     {
         if (collision.CompareTag("Score"))
         {
-            if (!DrawLine.Locked)
+            if (!manager.BoxLocked)
             {
-                manager.ShotControl();
+                manager.ShotControl(gameObject.transform.position);
             }
             gameObject.SetActive(false);
         }
         else if (collision.CompareTag("GameOver"))
         {
+            manager.BoxLocked = true;
             manager.Lose(); 
         }
     }

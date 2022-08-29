@@ -10,7 +10,7 @@ public class BallShot : MonoBehaviour
     [SerializeField] GameObject[] BoxPoint;
     [SerializeField] GameManager manager;
     int CurrentBall;
-    int LevelValue;
+    int ShotAmount;
     bool Locked;
 
     IEnumerator ShotOperation()
@@ -21,6 +21,7 @@ public class BallShot : MonoBehaviour
             {
                 DrawLine.Locked = false;
                 yield return new WaitForSeconds(1f);
+                manager.GeneralSounds[2].Play();
                 BallOperation();
                 Invoke("BoxOperation", 0.7f);
                 Invoke("StartTime", 5f);
@@ -32,8 +33,6 @@ public class BallShot : MonoBehaviour
             }
         }   
     }
-
-
     public void ShotControl()
     {
         Box.SetActive(false);
@@ -46,14 +45,33 @@ public class BallShot : MonoBehaviour
     }
     void BallOperation()
     {
-        if (LevelValue%3==0)
+        if (ShotAmount != 0 && ShotAmount % 3==0)
         {
-
+            manager.OperationOrder = 2;
+            for (int i = 0; i < 2; i++)
+            {
+                BallAndShotOperation();
+            }
         }
         else
         {
-
+            BallAndShotOperation();
         }
+        ShotAmount++;
+    }
+    void BoxOperation()
+    {
+        int randrom = Random.Range(0, BoxPoint.Length);
+        Box.transform.position = BoxPoint[randrom].transform.position;
+        Box.SetActive(true);
+    }
+    void StartTime()
+    {
+        manager.Lose();
+        manager.BoxLocked = true;
+    }
+    void BallAndShotOperation()
+    {
         Balls[CurrentBall].transform.position = ShotPoint.transform.position;
         Balls[CurrentBall].SetActive(true);
         Balls[CurrentBall].GetComponent<Rigidbody2D>().AddForce(750 * NewPos());
@@ -66,19 +84,6 @@ public class BallShot : MonoBehaviour
             CurrentBall = 0;
         }
     }
-    void BoxOperation()
-    {
-        int randrom = Random.Range(0, BoxPoint.Length);
-        Box.transform.position = BoxPoint[randrom].transform.position;
-        Box.SetActive(true);
-    }
-
-    void StartTime()
-    {
-        manager.Lose();
-    }
-    
-   
     Vector3 NewPos()
     {
         return Quaternion.AngleAxis(RandomAngle(70f,110f), Vector3.forward) * Vector3.right;
@@ -87,4 +92,5 @@ public class BallShot : MonoBehaviour
     {
         return Random.Range(value1, value2);
     }
+
 }
